@@ -1,156 +1,137 @@
 # Topic Modeling of COVID-19 Research
-![Predicting a Brighter Future A Data-Driven Approach to Substance Treatment Success](https://github.com/chicofanito/Capstone-2/assets/59300889/5d7a3767-73ec-4a5c-a879-1bb6f292ab1a)
+<img width="614" alt="Screenshot 2024-01-20 215647" src="https://github.com/patricotyrell/NLP-Topic-Modeling/assets/59300889/96708498-cb5c-49db-a321-693acf353bd6">
 
 ## Introduction
-According to the Centers for Disease Control
-and Prevention (CDC), more than one million
-people have died since 1999 from a drug
-overdose. In 2021, 106,699 drug overdose
-deaths occurred in the United States. The
-age-adjusted rate of overdose deaths
-increased by 14% from 2020 (28.3 per
-100,000) to 2021 (32.4 per 100,000).This project aims to leverage machine learning
-techniques to investigate disparities in
-substance use disorder (SUD) treatment
-success. The primary objective is to develop
-predictive models capable of identifying
-individuals who are likely to successfully
-complete substance use treatment programs.
-The project's investigation is motivated by the
-disparities in SUD treatment services and
-outcomes. By identifying key predictors of
-successful treatment and revealing disparities,
-this project seeks to illuminate strengths and
-weaknesses in service delivery. This analysis has
-the potential to boost treatment success rates,
-ultimately addressing unmet treatment needs.
+The COVID-19 pandemic has generated an immense volume of scholarly articles, presenting a challenge for researchers and policymakers to stay abreast of evolving trends. This project will apply Natural Language Processing (NLP) techniques for topic modeling and trend analysis to extract valuable insights from the COVID-19 Open Research Dataset (CORD-19). The purpose of the project was to use NLP to clearly define and interpret topics derived from scientific literature.
 
 ## 1. Data
-The project utilized data from the Treatment Episode
-Data Set: Discharge (TEDS-D), sourced from the
-Substance Abuse and Mental Health Services
-Administration (SAMHSA). Data regarding the number of treatment facilities and response rates was extracted from SAMHSA's PDF reports. Additionally, population statistics and geographical details were sourced from Wikipedia. Links to these data sources are listed below:
+The project utilized the COVID-19 Open Research Dataset (CORD-19) published on Kaggle. This was prepared by the White House and a coalition of leading research groups. The CORD-19 is a resource of over 1,000,000 scholarly articles, including over 400,000 with full text, about COVID-19, SARS-CoV-2, and related coronaviruses. See the link to the data source below:
 
-* [TEDS-D DATA](https://www.datafiles.samhsa.gov/dataset/treatment-episode-data-set-admissions-2020-teds-2020-ds0001)
-* [Facility Data](https://www.samhsa.gov/data/sites/default/files/reports/rpt35969/2020%20NSSATS%20State%20Profiles_FINAL.pdf)
-* [Wikipedia Population Data](https://simple.wikipedia.org/w/index.php?title=List_of_U.S._states&oldid=7168473)
+* [CORD-19 Dataset](https://www.kaggle.com/code/divyapatel4/cord-19-dataset-cleaner/notebook#Finding-The-Number-Of-Best-Topics-As-Parameter)
 
 ## 2. Data Wrangling
-[Full Data Wrangling Report](https://github.com/chicofanito/Capstone-2/blob/6467d9de1632185f90dbf203b09615695727ca3d/notebooks/Capstone%202%20-%20Substance%20Use%20Treatment%20-%20Data%20Wrangling.ipynb)
+[Full Data Wrangling Report](https://github.com/patricotyrell/NLP-Topic-Modeling/blob/410363b4b668a4ea6bc0c905990b147b516463e6/Topic%20Modeling%20Data%20Wrangling.ipynb)
 
-In the process of preparing the TEDS-D dataset for analysis, I had a few data-wrangling challenges. An overview of the main issues is presented below:
+Here are some of the high-level steps taken to prepare the CORD-19 dataset for analysis:
 
-**Problem 1: The TEDS-D included all admissions and discharges, rather than individual cases.**
->**Solution: To tackle this, a filtering approach was applied to retain only those records corresponding to individuals without prior substance use disorder (SUD) treatment. This transformation aligned the dataset with the goal of studying unique individual instances and resulted in a dataset containing 503,107 distinct individuals.**
+**1. Merging Metadata and JSON Files:**
+>Metadata from CSV files was merged with the content of JSON files and a random sample of 10,000 papers was chosen from the merged dataset.
 
-**Problem 2: Significant amount of missing data**
->**Solution: While this might not be ideal as some important variables may have been lost, I excluded records with missing values in any of the predictors and outcome variables. This ensured the integrity of the data used for analysis.**
+**2. Exclusion of Invalid and Missing Papers:**
+>Papers with invalid formats and those lacking metadata or having empty body text were excluded from the sample. The resulting dataset comprised 8,656 papers.
 
-**Problem 3 No single source provided information on the total treatment facility count by state.**
->**Solution: To overcome this challenge, data was extracted from PDF reports to acquire details on the number of treatment facilities surveyed by The Substance Abuse and Mental Health Services Administration and response rates. By combining response rates with the count of facilities surveyed, the total number of treatment facilities for each state was accurately computed.**
+**3. Language Identification and Filtering:**
+>A language column was created to identify the language of each paper and of the 8,656 papers, 8,465 were identified as being in English, while non-English papers were dropped.
 
-**Problem 4: Misspelled state names and special characters within the dataset**
->**Solution: To facilitate data merging by state, all special characters were removed, and state name spellings were corrected.**
+**4. Text Cleaning:**
+>Both abstract and body text underwent a comprehensive cleaning process, including the removal of special characters, numbers, and punctuation using regular expressions; conversion of text to lowercase; tokenization of text into words, removal of stop words using NLTK's stop words; application of stemming using the Porter Stemmer.
 
 ## 3.Exploratory Data Analysis
 
-[Full EDA Report](https://github.com/chicofanito/Capstone-2/blob/076e87994a52d55b0afb9871d50bf36c89e0c72c/data/Capstone%202%20-%20Substance%20Use%20Treatment%20-%20EDA.ipynb)
+[Full EDA Report](https://github.com/patricotyrell/NLP-Topic-Modeling/blob/410363b4b668a4ea6bc0c905990b147b516463e6/Topic%20Modeling%20EDA.ipynb)
 
-The data indicates an improvement in completion rates beyond the age of 44, with the 12-14 age group displaying the lowest completion rate.
+In the abstracts, trigrams such as ('sar', 'cov', 'infect') and ('coronaviru', 'diseas', '2019') shed light on the virology and temporal context of the SARS-CoV virus. Notably, ('sever', 'acut', 'respiratori') and ('acut', 'respiratori', 'syndrom') highlight the severity and acute respiratory conditions associated with the virus. These findings, in the abstracts, serve as a snapshot, capturing key aspects of COVID-19 research and providing a high-level understanding of the priorities.
 
-![image](https://github.com/chicofanito/Capstone-2/assets/59300889/064818bf-6c9a-4255-b8cc-3fafb3d7ba17)
+<img width="459" alt="Picture1" src="https://github.com/patricotyrell/NLP-Topic-Modeling/assets/59300889/cc7b12b9-03dc-49a1-8a44-1909156bcc6d">
 
+The word clouds reveal terms such as "patient", "sar", "cov", and "model" were prominent throughout the papers.
 
-Boxplot analysis suggests that there could be disparities in the distribution of treatment facilities per population between cases of completed and incomplete treatment.
-
-![image](https://github.com/chicofanito/Capstone-2/assets/59300889/18ccca22-9a6a-4640-bd46-4da24ec39378)
+<img width="468" alt="Picture 3" src="https://github.com/patricotyrell/NLP-Topic-Modeling/assets/59300889/09a9bccb-47b4-4b98-a1f6-ac2fc69a2461">
 
 
 ## 4. Preprocessing
-[Preprocessing Report](https://github.com/chicofanito/Capstone-2/blob/076e87994a52d55b0afb9871d50bf36c89e0c72c/data/Capstone%202%20-%20Substance%20Use%20Treatment%20-%20Preprocessing.ipynb)
+[Preprocessing Report](https://github.com/patricotyrell/NLP-Topic-Modeling/blob/410363b4b668a4ea6bc0c905990b147b516463e6/NLP%20Topic%20Modeling%20-%20Preprocessing.ipynb)
 
-In the data preprocessing phase, several essential steps were taken to prepare the dataset for machine learning modeling. These steps included calculating the population per square mile, selecting relevant columns, creating dummy variables for categorical features, standardizing numeric attributes, and encoding the target variable.
+The preprocessing pipeline for the abstracts and body texts involved several steps to prepare them for topic modeling. 
+The cleaned and processed abstracts and body texts were transformed into a numerical representation called a Document-Term Matrix (DTM) using CountVectorizer. 
+This matrix captures the frequency of each word in each document, providing a foundation for quantitative analysis and topic modeling of the research content. The final files were exported to be used for modeling.
+
 
 ## 5. Modeling & Evaluation
 [Modeling Report](https://github.com/chicofanito/Capstone-2/blob/076e87994a52d55b0afb9871d50bf36c89e0c72c/data/Capstone%202%20-%20Substance%20Use%20Treatment%20-%20Modeling.ipynb)
 
-This is a classification problem as we are trying to predict treatment outcomes (complete or incomplete). I explored these
-conventional machine learning models to build the model and compare performances:
-* Logistic Regression:
-* Random Forest:
-* K-Nearest Neighbor (KNN)
-* Naive Bayes
-* Gradient Boosting
+In this research project, I utilized two topic modeling algorithms, Latent Dirichlet Allocation (LDA) and Non-Negative Matrix Factorization (NMF) techniques to extract and interpret topics from the extensive scientific literature on COVID-19.
 
-The Random Forest and Gradient Boosting models outperformed the other models. I chose to pursue the Random Forest Tree as my final algorithm. 
+The initial exploration considered both LDA and NMF as potential topic modeling algorithms. The decision to proceed with LDA was based on its inherent interpretability and higher coherence scores observed during preliminary analyses (Figure 3). Additionally, NMF's coherence scores were consistently lower, suggesting less semantically meaningful topics.
 
-![image](https://github.com/chicofanito/Capstone-2/assets/59300889/2dcbd400-007c-4d5a-956e-53183e80c801)
+<img width="404" alt="Picture 4" src="https://github.com/patricotyrell/NLP-Topic-Modeling/assets/59300889/53740596-508e-4a50-9ab4-56b4cb579549">
 
+## 6. Hyperparameter Tuning LDA Model
 
-## 6. Hyperparameter Tuning Random Forest Model
+To optimize the performance of the LDA model, hyperparameter tuning was employed, aiming to enhance coherence and topic distinctiveness. Despite minimal differences in coherence scores before and after hyperparameter tuning, LDA was deemed more suitable for its ability to generate topics that align with the study's objectives and maintain consistency in theme representation. 
 
-I utilized RandomizedSearchCV to tune the model with a randomized search over hyperparameters to reduce the computational cost compared to using grid search. 
-While accuracy increased slightly, ROC-AUC Score decreased after hypertuning using the random search. The decrease in the ROC-AUC score after hyperparameter tuning using random search could be due to the randomness involved in the search process. Randomized search explores a random subset of the hyperparameter space, and in some cases, it may not find hyperparameters that improve the model's performance on your specific dataset.
-Hence, I performed cross-validation to get a more stable estimate of the model's performance. This helped ensure that the hyperparameters were chosen based on more robust performance estimates.
-I performed 5-fold cross-validation on your Random Forest model, and the results indicate that the mean ROC-AUC score of approximately 0.879 suggests that your Random Forest model is performing well on the cross-validated subsets of your training data. The standard deviation is relatively small, indicating that the model's performance is consistent across different folds. This information provides more confidence in the model's predictive ability and its stability when applied to unseen data.
+## 7. Topics Discovered
 
-## 7. Top 10 Features
+I determined that 5 topics were optical for the LDA model based on coherence and perplexity scores. The topics were as follows:
 
-The features that were most influential in predicting treatment success were:
+**Topic 1: General COVID-19 and Model-related**
 
-1.	**The Census division**, specifically "Mountain," appears to be highly influential. It suggests that treatment outcomes may vary significantly by region, with the Mountain division having a strong positive impact on treatment success.
-2.	**Population density per square mile** is the second most important feature. It indicates that areas with higher population density may have a positive influence on treatment success. This could be due to better access to resources and support services.
-3.	**The state of Arizona** seems to be a crucial predictor, suggesting that individuals receiving treatment in Arizona may have a higher likelihood of successful treatment completion.
-4.	**The total number of treatment facilities** in the state is a significant factor. More treatment facilities could mean better access to care, increasing the chances of successful treatment outcomes.
-5.	**Individuals who do not report alcohol at admission** have a positive impact on treatment success. This feature suggests that those without alcohol use issues have a higher likelihood of completing treatment successfully.
-6.	Conversely, individuals who report using only other drugs (not alcohol) at admission also contribute positively to treatment success.
-7.	**Kentucky's state-specific impact** on treatment outcomes is relatively smaller than Arizona, but it still plays a role in predicting success.
-8.	Longer lengths of stay within the range of **61-90 days** have a positive influence on treatment success. This suggests that extended treatment durations may be more effective.
-9.	Similarly, very long stays (**181-365 days**) also contribute positively to successful treatment outcomes.
-10.	Stays within the range of **91-120 days** are another important factor, indicating that moderate-duration treatments have a favorable impact.
+*Keywords: covid, model, method, data, study, base, result, time, patient, perform*
 
-## 8. Final Predictions
+**Topic 2: Pandemic and Social Impact**
 
-My Random Forest model has achieved notable success in predicting treatment outcomes, as indicated by an accuracy of
-approximately 80.56%. This means that roughly 80.56% of the cases were correctly classified by the model. Additionally,
-the precision score of about 81.30% demonstrates that, among the cases predicted as successful treatment completions,
-the majority were indeed accurate predictions.
+*Keywords: covid, study, pandemic, result, social, health, student, effect, model, care*
 
-However, there are some downsides to consider. The model's recall, at around 63.70%, suggests that it missed identifying a
-substantial portion of actual successful treatment completions. This means there is room for improvement in capturing
-more positive cases. The F1-Score, which balances precision and recall, stands at about 71.43%, indicating a reasonably
-good balance, but further optimization may enhance overall performance. Lastly, the ROC-AUC score, approximately
-77.33%, suggests the model's ability to distinguish between the two classes is moderately effective, but fine-tuning could
-boost this aspect of the model.
+**Topic 3: Patient and Disease Characteristics**
 
-<img width="446" alt="image" src="https://github.com/patricotyrell/Capstone-2/assets/59300889/a40a96f9-4e2e-4fc1-92b1-da3a53a80d7b">
+*Keywords: patient, covid, cov, sar, study, infect, disease, severe, risk, hospital*
 
-<img width="445" alt="image" src="https://github.com/patricotyrell/Capstone-2/assets/59300889/643f4077-a9b5-4e09-b9cb-2c80300e7f14">
+**Topic 4: Vaccination and Health Research**
 
+*Keywords: vaccine, health, study, covid, effect, research, pandemic, infect, result, cov*
+
+**Topic 5: Cellular and Protein Aspects**
+
+*Keywords: cell, sar, patient, study, infect, disease, protein, cov, effect, covid*
+
+<img width="468" alt="Picture 5" src="https://github.com/patricotyrell/NLP-Topic-Modeling/assets/59300889/de5a862e-32cf-49ed-8361-8272f2a094a3">
+
+## 8. Summary of Findings
+
+The topics generated through Latent Dirichlet Allocation (LDA) modeling of the scientific literature on COVID-19 offer insight into the extensive body of work produced during the pandemic. These identified topics span a diverse range of themes, including general discussions on COVID-19, the societal impact of the pandemic, patient and disease characteristics, vaccination efforts, and cellular aspects of the virus. The consistency in themes across models, both before and after hyperparameter tuning, underscores the robustness of the topic identification process. These topics provide a structured representation in line with the study's goal of clearly defining and interpreting themes from the literature.
+The following general conclusions and implications emerged from the findings:
+>A. Diverse Research Themes: The identified topics encompass a wide array of research themes related to COVID-19, reflecting the diversity within the scientific literature on the subject.
+
+>B. Consistency in Themes: Despite subtle changes after hyperparameter tuning, the overall themes and keywords within topics remain consistent, indicating the robustness of the identified topics.
+
+>C. Interpretable Topics: The topics are interpretable and align with the broader context of COVID-19 research, providing valuable insights for researchers and practitioners into different aspects of the pandemic.
+
+>D. Relevance to Study Goals: Aligned with the study's goal, the identified topics offer a structured representation of key themes in the literature, enhancing understanding of the research landscape.
+
+>E. Implications for Further Analysis: The topics serve as a foundation for in-depth analysis, including exploration of subtopics, trends over time, and correlations between topics. Researchers can prioritize areas for further investigation based on the prevalence and significance of specific themes.
+
+>F. Communication and Decision-Making: Insights from the topics are valuable for communicating key findings to diverse audiences, including policymakers, healthcare professionals, and the general public. Understanding prevalent themes is crucial for informed decision-making during the ongoing pandemic and future ones.
+
+>G. Validation and Expert Input: While LDA models provide automated topic identification, validation by domain experts is essential. Collaboration with subject matter experts ensures that identified topics align with the latest developments and nuances in COVID-19 research.
 
 ## 9. Future Directions
 
-While my journey through model selection and hyperparameter tuning has yielded encouraging results, there are several avenues for future exploration and improvement:
-
-1. **Feature Engineering**: Continue to explore feature engineering techniques to create new variables or transform existing ones, potentially uncovering additional patterns that can enhance predictive performance.
+1.	**Temporal Evolution of Research Themes**:
    
-2. **Feature Importance**: Dig deeper into the feature importances generated by the Random Forest model.
+* Investigate the temporal evolution of topics within the COVID-19 literature. Analyze how research themes have shifted over time, identifying emerging topics and tracking the prevalence of key themes during different phases of the pandemic. This longitudinal analysis could provide insights into the dynamic nature of scientific discourse and evolving priorities in COVID-19 research.
+  
+3.	**Cross-Disciplinary Collaboration Analysis**:
+   
+* Explore the potential for cross-disciplinary collaboration in COVID-19 research by examining the co-occurrence of topics across different domains. Identify interdisciplinary intersections and assess the extent to which research themes from fields such as medicine, public health, social sciences, and technology converge. This could inform strategies for fostering collaboration and knowledge integration across diverse scientific communities.
+  
+5.	**Sentiment Analysis of Research Themes**:
 
-3. **Add more Variables**: Explore the potential impact of socioeconomic and demographic factors on treatment success, such as income, education, race, ethnicity, sex, and employment status.
-
-4. **Ensemble Methods**: Experiment with other ensemble methods like XGBoost, LightGBM, or AdaBoost to determine if any of them can surpass the performance of Random Forest.
-
-5. **Imbalanced Data Handling**: Since the dataset is highly imbalanced (more incomplete cases than complete cases), I can explore techniques such as oversampling, undersampling, or the use of synthetic data generation methods to mitigate class imbalance.
-
-6. **Model Interpretability**: Investigate techniques for improving the interpretability of Random Forest models, as they can sometimes be seen as "black boxes." Techniques like SHAP (SHapley Additive exPlanations) values or partial dependence plots can shed light on model predictions.
-
-7. **Deployment**: Since I would like to use the model in practice, I will have to consider the deployment pipeline, model monitoring, and integration with existing systems.
-Ethical Considerations: I have to ensure that the model is used in an ethical and responsible manner, avoiding biases and unintended consequences.
+* Conduct sentiment analysis on the identified topics to gauge the emotional tone and sentiment prevalent in COVID-19 literature. Analyzing sentiments associated with specific themes could provide insights into the emotional context of research findings. Understanding the emotional undertones may contribute to a more nuanced understanding of how scientific discourse reflects the challenges, concerns, or optimism within the research community.
 
 
-## 10. Credits
+## 10. Recommendations
 
-I would like to express my gratitude to the Schenectady Public Health Services for generously funding my course. Special thanks go to my Data Science mentor, Upom Malik, for his invaluable guidance and advice.
+1.	**Enhanced Validation with Expert Input**:
+   
+* Collaborate with domain experts, including researchers, clinicians, and public health professionals, to validate and refine the identified topics. Expert input can offer additional context, ensuring that the topics align with the latest developments, emerging trends, and nuances in COVID-19 research. This validation process enhances the reliability and accuracy of the identified topics.
+
+3.	**Integration of External Data Sources**:
+   
+* Integrate external data sources, such as citation networks, funding information, or global health data, to enrich the context around identified topics. Linking topics to citation patterns or funding sources can provide a broader understanding of the impact and influence of specific research themes. This integrated approach contributes to a more comprehensive analysis of the research landscape.
+
+3.	**Interactive Visualization for Knowledge Exploration**:
+  
+* Develop interactive visualization tools to facilitate knowledge exploration for researchers, policymakers, and the general public. Create user-friendly interfaces that allow stakeholders to navigate and explore the identified topics, enabling a deeper understanding of the interconnectedness of themes. Visualization tools can enhance the accessibility of complex research insights and promote data-driven decision-making.
 
 
 
